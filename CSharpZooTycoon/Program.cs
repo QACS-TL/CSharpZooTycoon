@@ -192,6 +192,22 @@ namespace CSharpZooTycoon
             string limbCount = GetAndValidateAttributeWhileEditing("LimbCount", "limb_count", ani.LimbCount.ToString());
             ani.LimbCount = Convert.ToInt32(limbCount);
 
+            //if (ani is Cat cat)
+            //{
+            //    string whiskerCount = GetAndValidateAttributeWhileEditing("WhiskerCount", "whisker_count", cat.WhiskerCount.ToString());
+            //    cat.WhiskerCount = Convert.ToInt32(whiskerCount);
+            //}
+            //if (ani is Dog dog)
+            //{
+            //    string tailLength = GetAndValidateAttributeWhileEditing("TailLength", "tail_length", dog.TailLength.ToString());
+            //    dog.TailLength = Convert.ToDouble(tailLength);
+            //}
+            //if (ani is Bird bird)
+            //{
+            //    string wingspan = GetAndValidateAttributeWhileEditing("Wingspan", "wingspan", bird.Wingspan.ToString());
+            //    bird.Wingspan = Convert.ToInt32(wingspan);
+            //}
+
             using (ZooContext db = new ZooContext())
             {
                 Animal an = db.Animals.SingleOrDefault(a => a.Id == ani.Id);
@@ -308,6 +324,91 @@ namespace CSharpZooTycoon
             ListAnimals(animals);
         }
 
+        public static void PrintFilterMenu()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Animals App - Filter Menu");
+            Console.WriteLine("1) Name");
+            Console.WriteLine("2) Colour");
+            Console.WriteLine("3) Limb Count");
+            Console.WriteLine("4) Type");
+            Console.WriteLine("5) Most Popular Colour");
+        }
+
+        public static string GetFilterValue(string filterType)
+        {
+            Console.Write($"Enter value to filter by {filterType}: ");
+            return Console.ReadLine()?.Trim() ?? string.Empty;
+        }
+
+        public static (List<string> Colours, int Count) GetMostPopularColours(List<Animal> animals)
+        {
+            if (animals == null || animals.Count == 0)
+                return (new List<string>(), 0);
+
+            var groups = animals
+                .GroupBy(a => (a.Colour ?? string.Empty).ToUpperInvariant())
+                .Select(g => new { Colour = g.Key, Count = g.Count() })
+                .ToList();
+
+            int max = groups.Max(g => g.Count);
+            var top = groups.Where(g => g.Count == max).Select(g => g.Colour).ToList();
+            return (top, max);
+        }
+
+        public static void FilterAnimals(List<Animal> animals)
+        {
+            PrintFilterMenu();
+            string choice = InputDetail("Choose an option");
+
+            switch (choice)
+            {
+                case "1":
+                    string nameFilter = GetFilterValue("Name");
+                    animals = animals.Where(a => a.Name.StartsWith(nameFilter, StringComparison.OrdinalIgnoreCase)).ToList();
+                    Console.WriteLine("Animals filtered by name.");
+                    break;
+                case "2":
+                    string colourFilter = GetFilterValue("Colour");
+                    animals = animals.Where(a => a.Colour.Equals(colourFilter, StringComparison.OrdinalIgnoreCase)).ToList();
+                    Console.WriteLine("Animals filtered by colour.");
+                    break;
+                case "3":
+                    string limbCountFilter = GetFilterValue("Limb Count");
+                    animals = animals.Where(a => a.LimbCount.ToString() == limbCountFilter).ToList();
+                    Console.WriteLine("Animals filtered by limb count.");
+                    break;
+                case "4":
+                    string typeFilter = GetFilterValue("Type");
+                    animals = animals.Where(a => a.Type.ToString() == typeFilter.ToUpper()).ToList();
+                    Console.WriteLine("Animals filtered by type.");
+                    break;
+                case "5":
+                    var analytics = GetMostPopularColours(animals);
+                    if (analytics.Colours.Count == 1)
+                    {
+                        Console.WriteLine($"The most popular animal colour is {analytics.Colours[0]} and there are {analytics.Count} {analytics.Colours[0]} animals in the collection");
+                        return;
+                    }
+                    else if (analytics.Colours.Count > 1)
+                    {
+                        string colourString = analytics.Colours.Count switch
+                        {
+                            2 => $"{analytics.Colours[0]} and {analytics.Colours[1]}",
+                            _ => string.Join(", ", analytics.Colours[..^1]) + $" and {analytics.Colours[^1]}"
+                        };
+                        Console.WriteLine($"The most popular animal colours are {colourString} and there are {analytics.Count} of each in the animals collection");
+                        return;
+                    }
+                    break;
+                default:
+                    Console.WriteLine("Bad input. Animals are unfiltered.");
+                    break;
+            }
+
+            ListAnimals(animals);
+        }
+
         public static void ListAnimals(List<Animal> animals)
         {
             for (int i = 0; i < animals.Count; i++)
@@ -342,7 +443,8 @@ namespace CSharpZooTycoon
             Console.WriteLine("4) Remove animal");
             Console.WriteLine("5) Feed animal");
             Console.WriteLine("6) Sort animals");
-            Console.WriteLine("7) Exit");
+            Console.WriteLine("7) Filter animals");
+            Console.WriteLine("8) Exit");
         }
 
         public static string InputDetail(string prompt)
@@ -379,6 +481,9 @@ namespace CSharpZooTycoon
                         SortAnimals(animals);
                         break;
                     case "7":
+                        FilterAnimals(animals);
+                        break;
+                    case "8":
                         Console.WriteLine("Goodbye — saving and exiting.");
                         return;
                     default:
