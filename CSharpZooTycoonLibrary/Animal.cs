@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace CSharpZooTycoonLibrary
 {
     public class Animal : IEquatable<Animal>, IComparable<Animal>, ICloneable<Animal>
     {
-        public static int id { get; set; } = 0;
+        //private static int id { get; set; } = 0;
         private static readonly HashSet<string> AllowedColours = new() { "BROWN", "BLACK", "WHITE", "ORANGE", "PURPLE", "PINK" };
         private static HashSet<string> AllowedSpecies = new() { "CAT", "DOG", "BIRD", "APE", "UNKNOWN" };
 
@@ -21,10 +22,15 @@ namespace CSharpZooTycoonLibrary
         private int _limbCount = 0;
         private int _id = 0;
 
-        public static int GenerateNewId()
+        //public static int GenerateNewId()
+        //{
+        //    id += 1;
+        //    return id;
+        //}
+
+        public Animal()
         {
-            id += 1;
-            return id;
+
         }
 
         public Animal(int? id = null, string name = "Anonymous", string colour = "Brown", int limbCount = 4, string type = "Animal")
@@ -33,14 +39,16 @@ namespace CSharpZooTycoonLibrary
             Colour = colour;
             LimbCount = limbCount;
             Type = type;
-            _id = id != null ? (int)id : GenerateNewId();
+            _id = id != null ? (int)id : 0;
         }
 
+        [Key]
         public int Id
         {
             get { return _id; }
             set { _id = value; }
         }
+
 
         public string Name
         {

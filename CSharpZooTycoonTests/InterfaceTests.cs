@@ -10,7 +10,7 @@ namespace CSharpZooTycoonTests
         public void TestSimilarAnimals()
         {
             //Arrange
-            Animal.id = 4; // Reset static count for consistent IDs
+            //Animal.id = 4; // Reset static count for consistent IDs
             string _name1 = "Ted";
             string _type1 = "DOG";
             string _colour1 = "BLACK";

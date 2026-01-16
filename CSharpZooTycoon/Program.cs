@@ -1,23 +1,22 @@
-﻿using System.Globalization;
-using CSharpZooTycoonLibrary;
+﻿using CSharpZooTycoonLibrary;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace CSharpZooTycoon
 {
     public class Program
     {
+
         static HashSet<string> allowedSpecies = new() { "CAT", "DOG", "BIRD", "APE", "UNKNOWN" };
         static HashSet<string> allowedColours = new() { "BROWN", "BLACK", "WHITE", "ORANGE", "PURPLE", "PINK" };
 
         public static List<Animal> LoadAnimals()
         {
-            var animals = new List<Animal>
+            using (ZooContext db = new ZooContext())
             {
-                new Dog(name:"Fido", type:"DOG", colour:"BLACK", limbCount:4),
-                new Cat(name:"Fifi", type:"CAT", colour:"WHITE", limbCount:5),
-                new Bird(name:"Oscar", type:"BIRD", colour:"ORANGE", limbCount:3),
-                new Animal(name:"Boris", type:"ANIMAL", colour:"PURPLE", limbCount:3)
-            };
-            return animals;
+                var animals = db.Animals.ToList();
+                return animals;
+            }
         }
 
         public static bool IsNumeric(string value)
@@ -32,7 +31,6 @@ namespace CSharpZooTycoon
             // char.IsNumber returns true for any Unicode numeric digit.
             return value.All(char.IsNumber);
         }
-
 
         public static bool AttributeChecker(string attributeName, string value)
         {
@@ -79,6 +77,7 @@ namespace CSharpZooTycoon
         public static void AddAnimal(List<Animal> animals)
         {
             Console.WriteLine("Add a new animal");
+            Animal a = null;
             string name = GetAndValidateAttributeForAdding("Name");
             string type = GetAndValidateAttributeForAdding("Type");
             string colour = GetAndValidateAttributeForAdding("Colour");
@@ -88,20 +87,27 @@ namespace CSharpZooTycoon
             {
                 case "CAT":
                     string whiskerCount = GetAndValidateAttributeForAdding("WhiskerCount");
-                    animals.Add(new Cat(name: name, type: type.ToUpper(), colour: colour.ToUpper(), limbCount: Convert.ToInt32(limbCount), whiskerCount: Convert.ToInt32(whiskerCount)));
-                    return;
+                    a = new Cat(name: name, type: type.ToUpper(), colour: colour.ToUpper(), limbCount: Convert.ToInt32(limbCount), whiskerCount: Convert.ToInt32(whiskerCount));
+                    break;
                 case "DOG":
                     string tailLength = GetAndValidateAttributeForAdding("TailLength");
-                    animals.Add(new Dog(name: name, type: type.ToUpper(), colour: colour.ToUpper(), limbCount: Convert.ToInt32(limbCount), tailLength: Convert.ToDouble(tailLength)));
-                    return;
+                    a = new Dog(name: name, type: type.ToUpper(), colour: colour.ToUpper(), limbCount: Convert.ToInt32(limbCount), tailLength: Convert.ToDouble(tailLength));
+                    break;
                 case "BIRD":
                     string wingspan = GetAndValidateAttributeForAdding("Wingspan");
-                    animals.Add(new Bird(name: name, type: type.ToUpper(), colour: colour.ToUpper(), limbCount: Convert.ToInt32(limbCount), wingspan: Convert.ToInt32(wingspan)));
-                    return;
+                    a = new Bird(name: name, type: type.ToUpper(), colour: colour.ToUpper(), limbCount: Convert.ToInt32(limbCount), wingspan: Convert.ToInt32(wingspan));
+                    break;
                 default:
-                    animals.Add(new Animal(name: name, type: type.ToUpper(), colour: colour.ToUpper(), limbCount: Convert.ToInt32(limbCount)));
+                    a = new Animal(name: name, type: type.ToUpper(), colour: colour.ToUpper(), limbCount: Convert.ToInt32(limbCount));
                     break;
             }
+
+            using (ZooContext db = new ZooContext())
+            {
+                db.Animals.Add(a);
+                db.SaveChanges();
+            }
+
         }
 
         public static int? ChooseIndex(int maxN)
@@ -170,7 +176,6 @@ namespace CSharpZooTycoon
             return input;
         }
 
-
         public static void EditAnimal(List<Animal> animals)
         {
             string messageMode = "edit";
@@ -187,23 +192,33 @@ namespace CSharpZooTycoon
             string limbCount = GetAndValidateAttributeWhileEditing("LimbCount", "limb_count", ani.LimbCount.ToString());
             ani.LimbCount = Convert.ToInt32(limbCount);
 
-            switch (ani)
+            using (ZooContext db = new ZooContext())
             {
-                case Cat cat:
-                    string whiskerCount = GetAndValidateAttributeWhileEditing("WhiskerCount", "whisker_count", cat.WhiskerCount.ToString());
-                    cat.WhiskerCount = Convert.ToInt32(whiskerCount);
-                    break;
-                case Dog dog:
-                    string tailLength = GetAndValidateAttributeWhileEditing("TailLength", "tail_length", dog.TailLength.ToString());
-                    dog.TailLength = Convert.ToDouble(tailLength);
-                    break;
-                case Bird bird:
-                    string wingspan = GetAndValidateAttributeWhileEditing("Wingspan", "wingspan", bird.Wingspan.ToString());
-                    bird.Wingspan = Convert.ToInt32(wingspan);
-                    break;
+                Animal an = db.Animals.SingleOrDefault(a => a.Id == ani.Id);
+                if (an != null)
+                {
+                    an.Name = ani.Name;
+                    an.Colour = ani.Colour;
+                    an.LimbCount = ani.LimbCount;
+                    an.Type = ani.Type;
+                    switch (an)
+                    {
+                        case Cat cat:
+                            string whiskerCount = GetAndValidateAttributeWhileEditing("WhiskerCount", "whisker_count", cat.WhiskerCount.ToString());
+                            cat.WhiskerCount = Convert.ToInt32(whiskerCount);
+                            break;
+                        case Dog dog:
+                            string tailLength = GetAndValidateAttributeWhileEditing("TailLength", "tail_length", dog.TailLength.ToString());
+                            dog.TailLength = Convert.ToDouble(tailLength);
+                            break;
+                        case Bird bird:
+                            string wingspan = GetAndValidateAttributeWhileEditing("Wingspan", "wingspan", bird.Wingspan.ToString());
+                            bird.Wingspan = Convert.ToInt32(wingspan);
+                            break;
+                    }
+                }
+                db.SaveChanges();
             }
-
-            //SaveAnimals(animals);
             Console.WriteLine("Saved changes.");
         }
 
@@ -216,8 +231,12 @@ namespace CSharpZooTycoon
             if (qf || ani == null)
                 return;
 
-            animals.Remove(ani);
-            //SaveAnimals(animals);
+            using (ZooContext db = new ZooContext())
+            {
+                db.Animals.Remove(ani);
+                db.SaveChanges();
+            }
+
             Console.WriteLine($"Removed {ani.Name}");
         }
 
@@ -334,10 +353,9 @@ namespace CSharpZooTycoon
 
         public static void MainMenu()
         {
-            List<Animal> animals = LoadAnimals();
-
             while (true)
             {
+                List<Animal> animals = LoadAnimals();
                 PrintMenu();
                 string choice = InputDetail("Choose an option");
                 switch (choice)

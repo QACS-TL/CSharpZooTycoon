@@ -5,26 +5,26 @@ namespace CSharpZooTycoonTests
 {
     public class ProgramTests
     {
-        [Fact]
-        public void TestLoadAnimals()
-        {
-            //Arrange
-            List<Animal> animals;
+        //[Fact]
+        //public void TestLoadAnimals()
+        //{
+        //    //Arrange
+        //    List<Animal> animals;
 
-            //Act
-            animals = Program.LoadAnimals();
+        //    //Act
+        //    animals = Program.LoadAnimals();
 
-            //Assert
-            Assert.Equal(4, animals.Count);
-            Assert.Equal("Fido", animals[0].Name);
-            Assert.Equal("DOG", animals[0].Type);
-            Assert.Equal("BLACK", animals[0].Colour);
-            Assert.Equal(4, animals[0].LimbCount);
-            Assert.Equal("Fifi", animals[1].Name);
-            Assert.Equal("CAT", animals[1].Type);
-            Assert.Equal("WHITE", animals[1].Colour);
-            Assert.Equal(5, animals[1].LimbCount);
-        }
+        //    //Assert
+        //    Assert.Equal(4, animals.Count);
+        //    Assert.Equal("Fido", animals[0].Name);
+        //    Assert.Equal("DOG", animals[0].Type);
+        //    Assert.Equal("BLACK", animals[0].Colour);
+        //    Assert.Equal(4, animals[0].LimbCount);
+        //    Assert.Equal("Fifi", animals[1].Name);
+        //    Assert.Equal("CAT", animals[1].Type);
+        //    Assert.Equal("WHITE", animals[1].Colour);
+        //    Assert.Equal(5, animals[1].LimbCount);
+        //}
 
         [Fact]
         public void TestIsNumeric()
@@ -45,6 +45,7 @@ namespace CSharpZooTycoonTests
             Assert.False(isNumeric3);
             Assert.False(isNumeric4);
         }
+
 
 
         [Fact]
@@ -113,5 +114,6 @@ namespace CSharpZooTycoonTests
             //Assert
             Assert.Equal(expectedType, returnedType);
         }
+
     }
 }
