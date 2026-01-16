@@ -19,53 +19,193 @@ namespace CSharpZooTycoon
             return animals;
         }
 
+        public static bool IsNumeric(string value)
+        {
+            // Guard clause: if the string is null or empty, it cannot be numeric.
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            // Use LINQ to check if all characters in the string are numeric digits.
+            // char.IsNumber returns true for any Unicode numeric digit.
+            return value.All(char.IsNumber);
+        }
+
+        public static bool AttributeChecker(string attributeName, string value)
+        {
+            switch (attributeName)
+            {
+                case "Name":
+                    return value.Length < 2;
+                case "Type":
+                    return !allowedSpecies.Contains(value.ToUpper());
+                case "Colour":
+                    return !allowedColours.Contains(value.ToUpper());
+                case "LimbCount":
+                    return !IsNumeric(value) || (int.Parse(value) < 0);
+                default:
+                    return true;
+            }
+        }
+
+        public static string GetAndValidateAttributeForAdding(string animalAttribute)
+        {
+            Console.Write($"{animalAttribute}: ");
+            string value = Console.ReadLine()?.Trim() ?? string.Empty;
+            while (AttributeChecker(animalAttribute, value))
+            {
+                Console.WriteLine($"Invalid {animalAttribute}, please try again.");
+                Console.Write($"{animalAttribute}: ");
+                value = Console.ReadLine()?.Trim() ?? string.Empty;
+            }
+
+            return value;
+        }
 
         public static void AddAnimal(List<Dictionary<string, string>> animals)
         {
             Console.WriteLine("Add a new animal");
 
-            Console.Write("Name: ");
-            string name = Console.ReadLine()?.Trim() ?? string.Empty;
-            while (name.Length < 2)
-            {
-                Console.WriteLine("Invalid name, please try again.");
-                Console.Write("Name: ");
-                name = Console.ReadLine()?.Trim() ?? string.Empty;
-            }
+            string name = GetAndValidateAttributeForAdding("Name");
+            string type = GetAndValidateAttributeForAdding("Type");
+            string colour = GetAndValidateAttributeForAdding("Colour");
+            string limbCount = GetAndValidateAttributeForAdding("LimbCount");
 
-            Console.Write("Type: ");
-            string species = Console.ReadLine()?.Trim().ToUpper() ?? string.Empty;
-            while (!allowedSpecies.Contains(species))
-            {
-                Console.WriteLine("Invalid Type, please try again.");
-                Console.Write("Type: ");
-                species = Console.ReadLine()?.Trim().ToUpper() ?? string.Empty;
-            }
-
-            Console.Write("Colour: ");
-            string colour = Console.ReadLine()?.Trim().ToUpper() ?? string.Empty;
-            while (!allowedColours.Contains(colour))
-            {
-                Console.WriteLine("Invalid colour, please try again.");
-                Console.Write("Colour: ");
-                colour = Console.ReadLine()?.Trim().ToUpper() ?? string.Empty;
-            }
-
-            Console.Write("Limb Count: ");
-            string limbCountInput = Console.ReadLine()?.Trim() ?? string.Empty;
-            bool parsed = int.TryParse(limbCountInput, out int limbCount);
-            while (!parsed || limbCount < 0)
-            {
-                Console.WriteLine("Invalid limb count, please try again.");
-                Console.Write("Limb Count: ");
-                limbCountInput = Console.ReadLine()?.Trim() ?? string.Empty;
-                parsed = int.TryParse(limbCountInput, out limbCount);
-            }
-
-            animals.Add(new Dictionary<string, string> { { "Name", name }, { "Colour", colour }, { "LimbCount", limbCount.ToString() }, { "Type", species } });
+            animals.Add(new Dictionary<string, string> { { "Name", name }, { "Type", type.ToUpper() }, { "Colour", colour.ToUpper() }, { "LimbCount", limbCount.ToString() } });
         }
 
+        public static int? ChooseIndex(int maxN)
+        {
+            string raw = InputDetail("Choose number (or blank to cancel)");
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                Console.WriteLine("Cancelled.");
+                return null;
+            }
 
+            if (!int.TryParse(raw, out int n))
+            {
+                Console.WriteLine("Invalid selection");
+                return null;
+            }
+
+            if (n >= 1 && n <= maxN)
+                return n - 1;
+
+            Console.WriteLine("Invalid selection");
+            return null;
+        }
+
+        public static (Dictionary<string, string>? selected, bool Quit) AnimalSelector(List<Dictionary<string, string>> animals, string messageMode, bool quitFlag)
+        {
+            var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(messageMode ?? string.Empty);
+            Console.WriteLine($"{title} animals");
+
+            if (animals == null || animals.Count == 0)
+            {
+                Console.WriteLine($"No animals to {messageMode}.");
+                quitFlag = true;
+            }
+
+            ListAnimals(animals);
+
+            int? idx = ChooseIndex(animals?.Count ?? 0);
+            if (!idx.HasValue)
+            {
+                quitFlag = true;
+                return (null, quitFlag);
+            }
+
+            return (animals[idx.Value], quitFlag);
+        }
+
+        public static string GetAndValidateAttributeWhileEditing(string animalAttribute, string propertyName, string currentValue)
+        {
+            Console.Write($"{propertyName} [{currentValue}]: ");
+            string input = Console.ReadLine()?.Trim() ?? string.Empty;
+
+            // blank => keep existing value
+            if (string.IsNullOrEmpty(input))
+                return currentValue;
+
+            while (AttributeChecker(animalAttribute, input))
+            {
+                Console.WriteLine($"Invalid {propertyName}, please try again.");
+                Console.Write($"{propertyName} [{currentValue}]: ");
+                input = Console.ReadLine()?.Trim() ?? string.Empty;
+                if (string.IsNullOrEmpty(input))
+                    return currentValue;
+            }
+
+            return input;
+        }
+
+        public static void EditAnimal(List<Dictionary<string, string>> animals)
+        {
+            string messageMode = "edit";
+            bool quitFlag = false;
+
+            var (ani, qf) = AnimalSelector(animals, messageMode, quitFlag);
+            if (qf || ani == null)
+                return;
+
+            Console.WriteLine("Current attributes (leave blank to keep):");
+
+            ani["Name"] = GetAndValidateAttributeWhileEditing("Name", "name", ani["Name"]);
+            ani["Colour"] = GetAndValidateAttributeWhileEditing("Colour", "colour", ani["Colour"]);
+            string limbCount = GetAndValidateAttributeWhileEditing("LimbCount", "limb_count", ani["LimbCount"].ToString());
+            ani["LimbCount"] = limbCount;
+
+            //SaveAnimals(animals);
+            Console.WriteLine("Saved changes.");
+        }
+
+        public static void RemoveAnimal(List<Dictionary<string, string>> animals)
+        {
+            string messageMode = "remove";
+            bool quitFlag = false;
+
+            var (ani, qf) = AnimalSelector(animals, messageMode, quitFlag);
+            if (qf || ani == null)
+                return;
+
+            animals.Remove(ani);
+            //SaveAnimals(animals);
+            Console.WriteLine($"Removed {ani["Name"]}");
+        }
+
+        public static void FeedAnimal(List<Dictionary<string, string>> animals)
+        {
+            string messageMode = "feed";
+            bool quitFlag = false;
+
+            var (ani, qf) = AnimalSelector(animals, messageMode, quitFlag);
+            if (qf || ani == null)
+                return;
+
+            string food = ani["Type"].ToUpperInvariant() switch
+            {
+                "CAT" => "fish",
+                "DOG" => "biscuits",
+                "BIRD" => "seeds",
+                _ => "sandwiches"
+            };
+
+            string msg = $"I'm a {ani["Type"]} called {ani["Name"]} using some of my {ani["LimbCount"]} limbs to eat {food}.";
+            msg += $" You fed the {ani["Type"]} called {ani["Name"]}.";
+
+            if (ani["Type"].Equals("DOG", StringComparison.OrdinalIgnoreCase))
+                msg += " It's wagging its tail happily!";
+            else if (ani["Type"].Equals("CAT", StringComparison.OrdinalIgnoreCase))
+                msg += " It purrs contentedly.";
+            else if (ani["Type"].Equals("BIRD", StringComparison.OrdinalIgnoreCase))
+                msg += " It chirps sweetly.";
+            else
+                msg += " It seems satisfied.";
+
+            Console.WriteLine(msg);
+        }
 
         public static void ListAnimals(List<Dictionary<string, string>> animals)
         {
@@ -81,7 +221,10 @@ namespace CSharpZooTycoon
             Console.WriteLine("Animals App - Menu");
             Console.WriteLine("1) List animals");
             Console.WriteLine("2) Add animal");
-            Console.WriteLine("3) Exit");
+            Console.WriteLine("3) Edit animal");
+            Console.WriteLine("4) Remove animal");
+            Console.WriteLine("5) Feed animal");
+            Console.WriteLine("6) Exit");
         }
 
         public static string InputDetail(string prompt)
@@ -107,6 +250,15 @@ namespace CSharpZooTycoon
                         AddAnimal(animals);
                         break;
                     case "3":
+                        EditAnimal(animals);
+                        break;
+                    case "4":
+                        RemoveAnimal(animals);
+                        break;
+                    case "5":
+                        FeedAnimal(animals);
+                        break;
+                    case "6":
                         Console.WriteLine("Goodbye — saving and exiting.");
                         return;
                     default:
@@ -120,6 +272,6 @@ namespace CSharpZooTycoon
         {
             MainMenu();
         }
-
     }
 }
+
