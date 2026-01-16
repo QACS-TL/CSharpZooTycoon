@@ -13,6 +13,16 @@ namespace CSharpZooTycoon
         {
             using (ZooContext db = new ZooContext())
             {
+                //To trigger an exception edit the "Data Source" entry in the connection string in ZooContext to be invalid
+                try
+                { 
+                    db.Database.EnsureCreated();
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex.Message, ex);
+                    Environment.Exit(1); // Exit with a non-zero code to indicate an error
+                }
                 var animals = db.Animals.ToList();
                 return animals;
             }
@@ -498,6 +508,35 @@ namespace CSharpZooTycoon
         public static void Main(string[] args)
         {
             MainMenu();
+        }
+
+        static void LogError(string message, Exception ex = null)
+        {
+            string logFilePath = "error.log"; // You can use an absolute path if needed
+
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(logFilePath, append: true))
+                {
+                    writer.WriteLine("=== ERROR ===");
+                    writer.WriteLine($"Timestamp: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                    writer.WriteLine($"Message: {message}");
+                    if (ex != null)
+                    {
+                        writer.WriteLine($"Exception Type: {ex.GetType().FullName}");
+                        writer.WriteLine($"Stack Trace: {ex.StackTrace}");
+                    }
+                    writer.WriteLine();
+                }
+
+                // Also write to the console's error stream
+                Console.Error.WriteLine($"Error: {message}");
+            }
+            catch (IOException ioEx)
+            {
+                // If logging fails, at least show the error in the console
+                Console.Error.WriteLine($"Failed to write to log file: {ioEx.Message}");
+            }
         }
     }
 
