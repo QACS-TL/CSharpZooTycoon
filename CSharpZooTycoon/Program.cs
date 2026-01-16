@@ -63,6 +63,7 @@ namespace CSharpZooTycoon
             return value;
         }
 
+
         public static void AddAnimal(List<Dictionary<string, string>> animals)
         {
             Console.WriteLine("Add a new animal");
@@ -119,6 +120,7 @@ namespace CSharpZooTycoon
 
             return (animals[idx.Value], quitFlag);
         }
+
 
         public static string GetAndValidateAttributeWhileEditing(string animalAttribute, string propertyName, string currentValue)
         {
@@ -250,7 +252,7 @@ namespace CSharpZooTycoon
                         AddAnimal(animals);
                         break;
                     case "3":
-                        EditAnimal(animals);
+                        EditAnimal(animals); ;
                         break;
                     case "4":
                         RemoveAnimal(animals);
