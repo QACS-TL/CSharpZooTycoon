@@ -1,4 +1,5 @@
 ﻿using CSharpZooTycoon;
+using CSharpZooTycoonLibrary;
 
 namespace CSharpZooTycoonTests
 {
@@ -8,21 +9,21 @@ namespace CSharpZooTycoonTests
         public void TestLoadAnimals()
         {
             //Arrange
-            List<Dictionary<string, string>> animals;
+            List<Animal> animals;
 
             //Act
             animals = Program.LoadAnimals();
 
             //Assert
             Assert.Equal(4, animals.Count);
-            Assert.Equal("Fido", animals[0]["Name"]);
-            Assert.Equal("DOG", animals[0]["Type"]);
-            Assert.Equal("BLACK", animals[0]["Colour"]);
-            Assert.Equal(4, int.Parse(animals[0]["LimbCount"]));
-            Assert.Equal("Fifi", animals[1]["Name"]);
-            Assert.Equal("CAT", animals[1]["Type"]);
-            Assert.Equal("WHITE", animals[1]["Colour"]);
-            Assert.Equal(5, int.Parse(animals[1]["LimbCount"]));
+            Assert.Equal("Fido", animals[0].Name);
+            Assert.Equal("DOG", animals[0].Type);
+            Assert.Equal("BLACK", animals[0].Colour);
+            Assert.Equal(4, animals[0].LimbCount);
+            Assert.Equal("Fifi", animals[1].Name);
+            Assert.Equal("CAT", animals[1].Type);
+            Assert.Equal("WHITE", animals[1].Colour);
+            Assert.Equal(5, animals[1].LimbCount);
         }
 
         [Fact]
@@ -114,5 +115,19 @@ namespace CSharpZooTycoonTests
         }
 
 
+        [Fact]
+        public void TestGetAndValidateAttributeWhileEditingWithValidName()
+        {
+            //Arrange
+            string currentValue = "Ted";
+            var input = new StringReader("Bob\n");
+            var output = new StringWriter();
+            Console.SetIn(input);
+            Console.SetOut(output);
+            //Act
+            string name = Program.GetAndValidateAttributeWhileEditing("Name", "name", currentValue);
+            //Assert
+            Assert.Equal("Bob", name);
+        }
     }
 }
