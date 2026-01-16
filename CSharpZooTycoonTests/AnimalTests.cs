@@ -1,11 +1,6 @@
-﻿using CSharpZooTycoonLibrary;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+﻿using CSharpZooTycoon;
+using System.Security.Cryptography;
+using CSharpZooTycoonLibrary;
 
 namespace CSharpZooTycoonTests
 {
@@ -20,12 +15,12 @@ namespace CSharpZooTycoonTests
             string _type = "DOG";
             string _colour = "BLACK";
             int _limbCount = 4;
-            string _id = "005";
-            string message = $"Id: {_id}, Name: {_name}, Species: {_type}, Colour: {_colour}, Limb Count: {_limbCount}"; ;
+            int _id = 5;
+            string message = $"Id: {_id:D3}, Name: {_name}, Species: {_type}, Colour: {_colour}, Limb Count: {_limbCount}"; ;
 
             //Act
-            Animal animal = new Animal(name: _name, type: _type, colour: _colour, limbCount: _limbCount);
-
+            Animal animal = new Animal(name:_name, type:_type, colour:_colour, limbCount:_limbCount);
+            
             //Assert
             Assert.Equal(message, animal.ToString());
         }
@@ -63,16 +58,15 @@ namespace CSharpZooTycoonTests
         public void TestCreateAnimalWithBadValues()
         {
             //Arrange
-            Animal.id = 4; // Reset static count for consistent IDs
             string _name = "T";
             string _type = "FROG";
             string _colour = "GREEN";
             int _limbCount = -1;
-            string _id = "005";
-            string expectedMessage = $"Id: {_id}, Name: {"Anonymous"}, Species: {"ANIMAL"}, Colour: {"BROWN"}, Limb Count: {0}"; ;
+            int _id = 5;
+            string expectedMessage = $"Id: {_id:D3}, Name: {"Anonymous"}, Species: {"ANIMAL"}, Colour: {"BROWN"}, Limb Count: {0}"; ;
 
             //Act
-            Animal animal = new Animal(name: _name, type: _type, colour: _colour, limbCount: _limbCount);
+            Animal animal = new Animal(id: _id, name: _name, type: _type, colour: _colour, limbCount: _limbCount);
 
             //Assert
             Assert.Equal(expectedMessage, animal.ToString());
@@ -82,16 +76,15 @@ namespace CSharpZooTycoonTests
         public void TestEat()
         {
             //Arrange
-            Animal.id = 4; // Reset static count for consistent IDs
             string _name = "Ted";
             string _type = "DOG";
             string _colour = "BLACK";
             string food = "fish";
             int _limbCount = 4;
             string expectedMessage = $"I'm a {_type} called {_name} using some of my {_limbCount} limbs to eat {food}.";
-            string expectedId = "005";
+            int _id = 5;
             //Act
-            Animal animal = new Animal(name: _name, type: _type, colour: _colour, limbCount: _limbCount);
+            Animal animal = new Animal(id: _id, name: _name, type: _type, colour: _colour, limbCount: _limbCount);
 
             string actualMessage = animal.Eat(food);
             //Assert
@@ -102,7 +95,6 @@ namespace CSharpZooTycoonTests
         public void TestMove()
         {
             //Arrange
-            Animal.id = 4; // Reset static count for consistent IDs
             string _name = "Ted";
             string _type = "DOG";
             string _colour = "BLACK";
@@ -111,9 +103,9 @@ namespace CSharpZooTycoonTests
             string direction = "north";
             int distance = 10;
             string expectedMessage = $"I'm a {_type} called {_name} moving {direction} for {distance} metres.";
-            string expectedId = "005";
+            int _id = 5;
             //Act
-            Animal animal = new Animal(name: _name, type: _type, colour: _colour, limbCount: _limbCount);
+            Animal animal = new Animal(id: _id, name: _name, type: _type, colour: _colour, limbCount: _limbCount);
 
             string actualMessage = animal.Move(direction, distance);
             //Assert

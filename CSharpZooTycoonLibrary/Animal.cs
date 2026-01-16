@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-
-using System;
-using System.Collections.Generic;
 
 namespace CSharpZooTycoonLibrary
 {
@@ -85,7 +83,7 @@ namespace CSharpZooTycoonLibrary
             }
         }
 
-        public string Eat(string food)
+        public virtual string Eat(string food)
         {
             return $"I'm a {Type} called {Name} using some of my {_limbCount} limbs to eat {food}.";
         }
