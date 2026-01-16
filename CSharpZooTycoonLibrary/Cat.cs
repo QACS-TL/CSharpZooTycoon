@@ -6,6 +6,10 @@ namespace CSharpZooTycoonLibrary
     public class Cat : Animal
     {
         private int _whiskerCount = 10;
+        public Cat()
+        {
+
+        }
 
         public Cat(int? id = null, string name = "Anonymous", string colour = "Brown", int limbCount = 4, int whiskerCount = 6, string type = "Cat")
             : base(id: id, name: name, colour: colour, limbCount: limbCount, type: type)
