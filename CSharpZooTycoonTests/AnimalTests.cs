@@ -10,6 +10,7 @@ namespace CSharpZooTycoonTests
         public void TestCreateAnimal()
         {
             //Arrange
+            //Animal.id = 4; // Reset static count for consistent IDs
             string _name = "Ted";
             string _type = "DOG";
             string _colour = "BLACK";
@@ -18,8 +19,8 @@ namespace CSharpZooTycoonTests
             string message = $"Id: {_id:D3}, Name: {_name}, Species: {_type}, Colour: {_colour}, Limb Count: {_limbCount}"; ;
 
             //Act
-            Animal animal = new Animal(id: _id, name:_name, type:_type, colour:_colour, limbCount:_limbCount);
-            
+            Animal animal = new Animal(id: _id, name: _name, type: _type, colour: _colour, limbCount: _limbCount);
+
             //Assert
             Assert.Equal(message, animal.ToString());
         }
@@ -28,7 +29,7 @@ namespace CSharpZooTycoonTests
         public void TestCreateTwoAnimals()
         {
             //Arrange
-            Animal.id = 4; // Reset static count for consistent IDs
+            //Animal.id = 4; // Reset static count for consistent IDs
             string _name1 = "Ted";
             string _type1 = "DOG";
             string _colour1 = "BLACK";
