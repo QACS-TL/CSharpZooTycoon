@@ -116,7 +116,7 @@ namespace CSharpZooTycoonTests
 
 
         [Fact]
-        public void TestGetAndValidateAttributeWhileEditingWithValidName()
+        public void TestGetAndValidateAttributeForEditingWithValidName()
         {
             //Arrange
             string currentValue = "Ted";
