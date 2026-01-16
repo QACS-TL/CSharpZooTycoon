@@ -6,6 +6,10 @@ namespace CSharpZooTycoonLibrary
     public class Dog : Animal
     {
         private double _tailLength = 0.2;
+        public Dog()
+        {
+
+        }
 
         public Dog(int? id = null, string name = "Anonymous", string colour = "Brown", int limbCount = 4, double tailLength = 0.25, string type = "Dog")
             : base(id: id, name: name, colour: colour, limbCount: limbCount, type: type)
