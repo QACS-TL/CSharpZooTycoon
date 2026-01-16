@@ -1,38 +1,78 @@
-﻿namespace CSharpZooTycoon
+﻿using System.Globalization;
+
+namespace CSharpZooTycoon
 {
     public class Program
     {
+        private static HashSet<string> allowedSpecies = new() { "CAT", "DOG", "BIRD", "APE", "UNKNOWN" };
+        private static HashSet<string> allowedColours = new() { "BROWN", "BLACK", "WHITE", "ORANGE", "PURPLE", "PINK" };
 
-        public static List<string> LoadAnimals()
+        public static List<Dictionary<string, string>> LoadAnimals()
         {
-            List<string> animals = new List<string>();
-            // csv animal values in string
-            // Name,Type,Colour,LimbCount
-            animals.Add("Fido,Dog,BLACK,4");
-            animals.Add("Fifi,Cat,WHITE,5");
-            animals.Add("Oscar,Bird,ORANGE,3");
-            animals.Add("Boris,Animal,PURPLE,3");
+            var animals = new List<Dictionary<string, string>>
+            {
+                new Dictionary<string, string>{{"Name","Fido"}, { "Colour", "BLACK" }, {"LimbCount", "4"}, {"Type", "DOG" }},
+                new Dictionary<string, string>{{"Name", "Fifi" }, { "Colour", "WHITE" }, {"LimbCount", "5"}, {"Type", "CAT" }},
+                new Dictionary<string, string>{{"Name", "Oscar" }, { "Colour", "ORANGE" }, {"LimbCount", "3"}, {"Type", "BIRD" }},
+                new Dictionary<string, string>{{"Name", "Boris" }, { "Colour", "PURPLE" }, {"LimbCount", "3"}, {"Type", "ANIMAL" }}
+            };
             return animals;
         }
 
-        public static void AddAnimal(List<string> animals)
-        {
-            Console.WriteLine("\nAdd a new animal");
-            Console.Write("Enter Animal Details (in form '{Name},{Type},{Colour},{LimbCount}': ");
-            string? animal = Console.ReadLine()?.Trim();
 
-            if (!string.IsNullOrEmpty(animal))
+        public static void AddAnimal(List<Dictionary<string, string>> animals)
+        {
+            Console.WriteLine("Add a new animal");
+
+            Console.Write("Name: ");
+            string name = Console.ReadLine()?.Trim() ?? string.Empty;
+            while (name.Length < 2)
             {
-                animals.Add(animal);
+                Console.WriteLine("Invalid name, please try again.");
+                Console.Write("Name: ");
+                name = Console.ReadLine()?.Trim() ?? string.Empty;
             }
+
+            Console.Write("Type: ");
+            string species = Console.ReadLine()?.Trim().ToUpper() ?? string.Empty;
+            while (!allowedSpecies.Contains(species))
+            {
+                Console.WriteLine("Invalid Type, please try again.");
+                Console.Write("Type: ");
+                species = Console.ReadLine()?.Trim().ToUpper() ?? string.Empty;
+            }
+
+            Console.Write("Colour: ");
+            string colour = Console.ReadLine()?.Trim().ToUpper() ?? string.Empty;
+            while (!allowedColours.Contains(colour))
+            {
+                Console.WriteLine("Invalid colour, please try again.");
+                Console.Write("Colour: ");
+                colour = Console.ReadLine()?.Trim().ToUpper() ?? string.Empty;
+            }
+
+            Console.Write("Limb Count: ");
+            string limbCountInput = Console.ReadLine()?.Trim() ?? string.Empty;
+            bool parsed = int.TryParse(limbCountInput, out int limbCount);
+            while (!parsed || limbCount < 0)
+            {
+                Console.WriteLine("Invalid limb count, please try again.");
+                Console.Write("Limb Count: ");
+                limbCountInput = Console.ReadLine()?.Trim() ?? string.Empty;
+                parsed = int.TryParse(limbCountInput, out limbCount);
+            }
+
+            animals.Add(new Dictionary<string, string> { { "Name", name }, { "Colour", colour }, { "LimbCount", limbCount.ToString() }, { "Type", species } });
         }
 
 
-        public static void ListAnimals(List<string> animals)
+
+        public static void ListAnimals(List<Dictionary<string, string>> animals)
         {
-            Console.WriteLine("\nAnimal Collection Details:");
-            Console.WriteLine(string.Join(", \n", animals));
-            Console.WriteLine($"My animals collection tells me there are {animals.Count} animals.");
+            for (int i = 0; i < animals.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}) Name: {animals[i]["Name"]}, Colour: {animals[i]["Colour"]}, LimbCount: {animals[i]["LimbCount"]}, Type: {animals[i]["Type"]}");
+            }
         }
 
         public static void PrintMenu()
@@ -52,7 +92,7 @@
 
         public static void MainMenu()
         {
-            List<string> animals = LoadAnimals();
+            List<Dictionary<string, string>> animals = LoadAnimals();
 
             while (true)
             {
@@ -80,7 +120,6 @@
         {
             MainMenu();
         }
+
     }
 }
-
-
