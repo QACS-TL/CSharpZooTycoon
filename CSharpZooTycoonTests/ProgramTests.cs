@@ -1,6 +1,4 @@
 ﻿using CSharpZooTycoon;
-using CSharpZooTycoonLibrary;
-
 namespace CSharpZooTycoonTests
 {
     public class ProgramTests
@@ -46,10 +44,8 @@ namespace CSharpZooTycoonTests
             Assert.False(isNumeric4);
         }
 
-
-
         [Fact]
-        public void TestGetAndValidateAttributeForAddingWithValidName()
+        public void TestGetAndValidateAttributeWithValidName()
         {
             //Arrange
             var input = new StringReader("Bob\n");
@@ -57,11 +53,10 @@ namespace CSharpZooTycoonTests
             Console.SetIn(input);
             Console.SetOut(output);
             //Act
-            string name = Program.GetAndValidateAttributeForAdding("Name");
+            string name = Program.GetAndValidateAttribute("Name", n => n.Length < 2, "Ted");
             //Assert
             Assert.Equal("Bob", name);
         }
-
 
         [Fact]
         public void TestGetAndValidateAttributeForAddingWithValidType()
@@ -74,7 +69,7 @@ namespace CSharpZooTycoonTests
             Console.SetOut(output);
 
             //Act
-            string type = Program.GetAndValidateAttributeForAdding("Type");
+            string type = Program.GetAndValidateAttribute("Type", s => !allowedSpecies.Contains(s.ToUpper()), null);
             //Assert
             Assert.Equal("Dog", type);
         }
@@ -91,7 +86,7 @@ namespace CSharpZooTycoonTests
             Console.SetOut(output);
 
             //Act
-            string type = Program.GetAndValidateAttributeForAdding("Type");
+            string type = Program.GetAndValidateAttribute("Type", s => !allowedSpecies.Contains(s.ToUpper()), null);
             //Assert
             Assert.Equal("Bird", type);
         }
@@ -110,7 +105,7 @@ namespace CSharpZooTycoonTests
             Console.SetIn(input);
             Console.SetOut(output);
             //Act
-            string returnedType = Program.GetAndValidateAttributeForAdding("Type");
+            string returnedType = Program.GetAndValidateAttribute("Type", s => !allowedSpecies.Contains(s.ToUpper()));
             //Assert
             Assert.Equal(expectedType, returnedType);
         }
