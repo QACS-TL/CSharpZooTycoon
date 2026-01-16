@@ -5,6 +5,7 @@ namespace CSharpZooTycoonLibrary
 {
     public class Bird : Animal
     {
+        // mirrors Python class attribute _wingspan = 10
         private int _wingspan = 10;
 
         public Bird(int? id = null, string name = "Anonymous", string colour = "Brown", int limbCount = 4, int wingspan = 10, string type = "Bird")
@@ -19,6 +20,7 @@ namespace CSharpZooTycoonLibrary
             set => _wingspan = value < 10 ? 10 : value;
         }
 
+        // Base Animal.Eat is not virtual in the provided code, so hide it to preserve Python behaviour.
         public new string Eat(string food)
         {
             return $"I'm a {Type} called {Name} pecking at {food}.";

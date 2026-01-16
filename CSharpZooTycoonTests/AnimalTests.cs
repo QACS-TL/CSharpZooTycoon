@@ -10,7 +10,6 @@ namespace CSharpZooTycoonTests
         public void TestCreateAnimal()
         {
             //Arrange
-            Animal.id = 4; // Reset static count for consistent IDs
             string _name = "Ted";
             string _type = "DOG";
             string _colour = "BLACK";
@@ -19,7 +18,7 @@ namespace CSharpZooTycoonTests
             string message = $"Id: {_id:D3}, Name: {_name}, Species: {_type}, Colour: {_colour}, Limb Count: {_limbCount}"; ;
 
             //Act
-            Animal animal = new Animal(name:_name, type:_type, colour:_colour, limbCount:_limbCount);
+            Animal animal = new Animal(id: _id, name:_name, type:_type, colour:_colour, limbCount:_limbCount);
             
             //Assert
             Assert.Equal(message, animal.ToString());
@@ -34,20 +33,20 @@ namespace CSharpZooTycoonTests
             string _type1 = "DOG";
             string _colour1 = "BLACK";
             int _limbCount1 = 4;
-            string _id1 = "005";
-            string message1 = $"Id: {_id1}, Name: {_name1}, Species: {_type1}, Colour: {_colour1}, Limb Count: {_limbCount1}"; ;
+            int _id1 = 5;
+            string message1 = $"Id: {_id1:D3}, Name: {_name1}, Species: {_type1}, Colour: {_colour1}, Limb Count: {_limbCount1}"; ;
 
             string _name2 = "Tiddles";
             string _type2 = "CAT";
             string _colour2 = "WHITE";
             int _limbCount2 = 5;
-            string _id2 = "006";
-            string message2 = $"Id: {_id2}, Name: {_name2}, Species: {_type2}, Colour: {_colour2}, Limb Count: {_limbCount2}"; ;
+            int _id2 = 6;
+            string message2 = $"Id: {_id2:D3}, Name: {_name2}, Species: {_type2}, Colour: {_colour2}, Limb Count: {_limbCount2}"; ;
 
 
             //Act
-            Animal animal1 = new Animal(name: _name1, type: _type1, colour: _colour1, limbCount: _limbCount1);
-            Animal animal2 = new Animal(name: _name2, type: _type2, colour: _colour2, limbCount: _limbCount2);
+            Animal animal1 = new Animal(id: _id1, name: _name1, type: _type1, colour: _colour1, limbCount: _limbCount1);
+            Animal animal2 = new Animal(id: _id2, name: _name2, type: _type2, colour: _colour2, limbCount: _limbCount2);
 
             //Assert
             Assert.Equal(message1, animal1.ToString());

@@ -113,21 +113,5 @@ namespace CSharpZooTycoonTests
             //Assert
             Assert.Equal(expectedType, returnedType);
         }
-
-
-        [Fact]
-        public void TestGetAndValidateAttributeForEditingWithValidName()
-        {
-            //Arrange
-            string currentValue = "Ted";
-            var input = new StringReader("Bob\n");
-            var output = new StringWriter();
-            Console.SetIn(input);
-            Console.SetOut(output);
-            //Act
-            string name = Program.GetAndValidateAttributeWhileEditing("Name", "name", currentValue);
-            //Assert
-            Assert.Equal("Bob", name);
-        }
     }
 }

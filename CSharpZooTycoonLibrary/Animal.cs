@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
+using System;
+using System.Collections.Generic;
+
 namespace CSharpZooTycoonLibrary
 {
-    public class Animal
+    public class Animal : IEquatable<Animal>, IComparable<Animal>, ICloneable<Animal>
     {
         public static int id { get; set; } = 0;
         private static readonly HashSet<string> AllowedColours = new() { "BROWN", "BLACK", "WHITE", "ORANGE", "PURPLE", "PINK" };
@@ -96,6 +98,69 @@ namespace CSharpZooTycoonLibrary
         public override string ToString()
         {
             return $"Id: {Id:D3}, Name: {Name}, Species: {Type}, Colour: {Colour}, Limb Count: {LimbCount}";
+        }
+
+        public bool Equals(Animal? other)
+        {
+            return this.Name.Equals(other.Name);
+        }
+
+        public int CompareTo(Animal? other)
+        {
+            return this.LimbCount - other.LimbCount;
+        }
+
+        public Animal Clone()
+        {
+            return (Animal)this.MemberwiseClone();
+        }
+
+        private static IComparer<Animal> _animalNameComparer = null;
+
+        public static IComparer<Animal> NameComparer
+        {
+            get
+            {
+                if (_animalNameComparer == null)
+                {
+                    _animalNameComparer = new AnimalNameComparer();
+                }
+                return _animalNameComparer;
+            }
+        }
+
+        private class AnimalNameComparer : IComparer<Animal>
+        {
+            public int Compare(Animal? x, Animal? y)
+            {
+                if (x == null || y == null)
+                    throw new ArgumentException("Arguments cannot be null");
+                return x.Name.CompareTo(y.Name);
+            }
+        }
+
+        private static IComparer<Animal> _animalColourComparer = null;
+
+        public static IComparer<Animal> ColourComparer
+        {
+            get
+            {
+                if (_animalColourComparer == null)
+                {
+                    _animalColourComparer = new AnimalColourComparer();
+                }
+                return _animalColourComparer;
+            }
+        }
+
+        private class AnimalColourComparer : IComparer<Animal>
+        {
+            public int Compare(Animal? x, Animal? y)
+            {
+                if (x == null || y == null)
+                    throw new ArgumentException("Arguments cannot be null");
+                return x.Colour.CompareTo(y.Colour);
+            }
         }
     }
 }

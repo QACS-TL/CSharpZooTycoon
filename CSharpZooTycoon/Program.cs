@@ -1,7 +1,5 @@
-﻿using CSharpZooTycoonLibrary;
-using System.Drawing;
-using System.Globalization;
-using System.Xml.Linq;
+﻿using System.Globalization;
+using CSharpZooTycoonLibrary;
 
 namespace CSharpZooTycoon
 {
@@ -34,6 +32,7 @@ namespace CSharpZooTycoon
             // char.IsNumber returns true for any Unicode numeric digit.
             return value.All(char.IsNumber);
         }
+
 
         public static bool AttributeChecker(string attributeName, string value)
         {
@@ -171,6 +170,7 @@ namespace CSharpZooTycoon
             return input;
         }
 
+
         public static void EditAnimal(List<Animal> animals)
         {
             string messageMode = "edit";
@@ -253,6 +253,42 @@ namespace CSharpZooTycoon
             Console.WriteLine(msg);
         }
 
+        public static void PrintSortMenu()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Animals App - Sort Menu");
+            Console.WriteLine("1) Name sequence");
+            Console.WriteLine("2) Colour sequence");
+            Console.WriteLine("3) Limb Count sequence");
+        }
+
+        public static void SortAnimals(List<Animal> animals)
+        {
+            PrintSortMenu();
+            string choice = InputDetail("Choose an option");
+
+            switch (choice)
+            {
+                case "1":
+                    animals.Sort(Animal.NameComparer);
+                    Console.WriteLine("Animals sorted by name.");
+                    break;
+                case "2":
+                    animals.Sort(Animal.ColourComparer);
+                    Console.WriteLine("Animals sorted by colour.");
+                    break;
+                case "3":
+                    animals.Sort();
+                    Console.WriteLine("Animals sorted by limb count.");
+                    break;
+                default:
+                    Console.WriteLine("Bad input. Animals sequence unchanged.");
+                    break;
+            }
+
+            ListAnimals(animals);
+        }
+
         public static void ListAnimals(List<Animal> animals)
         {
             for (int i = 0; i < animals.Count; i++)
@@ -286,7 +322,8 @@ namespace CSharpZooTycoon
             Console.WriteLine("3) Edit animal");
             Console.WriteLine("4) Remove animal");
             Console.WriteLine("5) Feed animal");
-            Console.WriteLine("6) Exit");
+            Console.WriteLine("6) Sort animals");
+            Console.WriteLine("7) Exit");
         }
 
         public static string InputDetail(string prompt)
@@ -321,6 +358,9 @@ namespace CSharpZooTycoon
                         FeedAnimal(animals);
                         break;
                     case "6":
+                        SortAnimals(animals);
+                        break;
+                    case "7":
                         Console.WriteLine("Goodbye — saving and exiting.");
                         return;
                     default:
